@@ -2525,6 +2525,12 @@
 		(uuid "230eacd2-b105-4f6d-8e2a-fc91574ea5e1")
 	)
 	(junction
+		(at 106.68 111.76)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "35ccb460-cfb2-4c48-9825-0b4bf30b4b74")
+	)
+	(junction
 		(at 83.82 134.62)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2541,6 +2547,12 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "7665f14d-9962-411d-a1ff-dfcf1ea5e92d")
+	)
+	(junction
+		(at 96.52 119.38)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "9b13d5b6-07b0-418b-b14d-e7c10769f1c5")
 	)
 	(junction
 		(at 125.73 134.62)
@@ -2718,7 +2730,7 @@
 	)
 	(wire
 		(pts
-			(xy 104.14 111.76) (xy 133.35 111.76)
+			(xy 104.14 111.76) (xy 106.68 111.76)
 		)
 		(stroke
 			(width 0)
@@ -2745,6 +2757,16 @@
 			(type default)
 		)
 		(uuid "484060f5-61a1-4f05-8f58-ccf4cef9f21f")
+	)
+	(wire
+		(pts
+			(xy 96.52 119.38) (xy 106.68 119.38)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4d14344b-b035-4940-82d8-f0222dfcf19f")
 	)
 	(wire
 		(pts
@@ -2965,6 +2987,16 @@
 			(type default)
 		)
 		(uuid "c6e5ef89-c2ed-40a5-9711-79630478ed71")
+	)
+	(wire
+		(pts
+			(xy 106.68 111.76) (xy 133.35 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5a62e18-cdb2-4437-bc7c-35629c272ae1")
 	)
 	(wire
 		(pts
@@ -3940,6 +3972,76 @@
 			(project "sch_bentro_controller"
 				(path "/4c494bf6-61ac-4c54-bb68-d6309caa82e3"
 					(reference "J1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 106.68 115.57 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a25e17ac-4433-4c59-a4e0-130c18f29cac")
+		(property "Reference" "R5"
+			(at 109.22 114.2999 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "100k"
+			(at 109.22 116.8399 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 104.902 115.57 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 106.68 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 106.68 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "7b00c081-1139-4853-96d7-61c97d4ee803")
+		)
+		(pin "1"
+			(uuid "20b52c07-47c3-4907-af9a-4fe29fb09059")
+		)
+		(instances
+			(project "sch_bentro_controller"
+				(path "/4c494bf6-61ac-4c54-bb68-d6309caa82e3"
+					(reference "R5")
 					(unit 1)
 				)
 			)
