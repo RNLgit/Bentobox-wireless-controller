@@ -3,6 +3,8 @@ A wireless controller for [Bentobox](https://www.printables.com/model/272525-ben
 
 Adds a remote / user friendly way to turn on / off the Bentobox from afar (actually not just Bentobox but lots of 12V device not exceeding 1.2A).
 
+![Bentobox Wireless Controller](img/BentoControllerEnclosure.png)
+
 
 ## Features:
 - wireless on / off Bentobox via webpage
