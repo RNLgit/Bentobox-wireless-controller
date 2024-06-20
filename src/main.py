@@ -1,7 +1,7 @@
 import time
 import network
 import socket
-from machine import ADC, Pin
+from machine import ADC, Pin, Timer
 from web import html
 
 f_cfg = open("config.cfg", "r")
@@ -13,7 +13,7 @@ fan_pin = Pin(17, Pin.OUT)
 button_pin = Pin(15, Pin.IN, Pin.PULL_UP)
 adc_pin = ADC(Pin(26))
 is_fan_on = False
-last_pressed = 0
+debounce_timer = Timer()
 
 
 def wifi_setup(ssid: str, password: str) -> network.WLAN:
@@ -48,6 +48,7 @@ def wifi_setup(ssid: str, password: str) -> network.WLAN:
 
 
 def http_fan_on_off(req: str) -> None:
+    global is_fan_on
     fan_on = req.find("fan=turn_on")
     fan_off = req.find("fan=turn_off")
 
@@ -71,36 +72,35 @@ def read_adc() -> float:
     return (4.75 + 10 + 10) / 4.75 * voltage
 
 
-def button_pressed_handler(pin):
+def debounce_handler(pin) -> None:
+    global debounce_timer
+    debounce_timer.init(mode=Timer.ONE_SHOT, period=1000, callback=button_pressed_handler)
+
+
+def button_pressed_handler(pin) -> None:
     print("Button: pressed interrupt loop")
     global is_fan_on
-    global last_pressed
-    current_time = time.ticks_ms()
-    if time.ticks_diff(current_time, last_pressed) > 200:  # debounce 200ms or greater between press
-        if not is_fan_on:
-            fan_pin.value(1)
-            is_fan_on = True
-            print(f"Button: pressed, turning fan on. is_fan_on: {is_fan_on}")
-        elif is_fan_on:
-            fan_pin.value(0)
-            is_fan_on = False
-            print(f"Button: pressed, turning fan off. is_fan_on: {is_fan_on}")
-        else:
-            print(f"Button: pressed, but invalid is_fan_on value: {is_fan_on}")
+    if not is_fan_on:
+        fan_pin.value(1)
+        is_fan_on = True
+        print(f"Button: pressed, turning fan on. is_fan_on: {is_fan_on}")
+    elif is_fan_on:
+        fan_pin.value(0)
+        is_fan_on = False
+        print(f"Button: pressed, turning fan off. is_fan_on: {is_fan_on}")
+    else:
+        print(f"Button: pressed, but invalid is_fan_on value: {is_fan_on}")
 
 
+button_pin.irq(trigger=Pin.IRQ_FALLING, handler=button_pressed_handler)  # upon boot up
 wlan = wifi_setup(ssid, password)
-button_pin.irq(trigger=Pin.IRQ_FALLING, handler=button_pressed_handler)
-
-
-# Open socket
 addr = socket.getaddrinfo("0.0.0.0", 80)[0][-1]
 s = socket.socket()
 s.bind(addr)
 s.listen(1)
 print("listening on", addr)
 
-# Listen for connections, serve client
+# serve http client
 while True:
     try:
         cl, addr = s.accept()
@@ -112,10 +112,13 @@ while True:
 
         http_fan_on_off(req)
 
-        fan_state = "FAN is OFF" if fan_pin.value() == 0 else "FAN is ON"
+        fan_state = "FAN set OFF" if fan_pin.value() == 0 else "FAN set ON"
+        adc_reading = round(read_adc(), 3)
 
         # Create and send response
-        stat_string = f"{fan_state}<br>ADC reading: {round(read_adc(), 3)}V"
+        stat_string = (
+            f"{fan_state}<br>ADC feedback confirmation: Fan {'ON' if adc_reading < 3 else 'OFF'} ({adc_reading}V)"
+        )
         response = html % stat_string
         cl.send("HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n")
         cl.send(response)
