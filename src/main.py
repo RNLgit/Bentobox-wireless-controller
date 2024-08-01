@@ -1,7 +1,8 @@
 import time
 import network
 import socket
-from machine import ADC, Pin, Timer
+import ubinascii
+from machine import ADC, Pin, Timer, unique_id, freq
 from web import html
 
 f_cfg = open("config.cfg", "r")
@@ -45,6 +46,23 @@ def wifi_setup(ssid: str, password: str) -> network.WLAN:
         wlan_ip, wlan_subnet_mask, wlan_gateway, wlan_dns_server = wlan.ifconfig()
         print(f"Connected, ip: {wlan_ip}")
         return wlan
+
+
+def get_wlan_info(wlan_obj):
+    """
+    wlan info: ssid, ip, mac
+    """
+    if wlan_obj.isconnected():
+        return wlan_obj.config("ssid"), wlan_obj.ifconfig()[0], ubinascii.hexlify(wlan_obj.config("mac"), ":").decode()
+    else:
+        return "No SSID", "No IP", "No MAC"
+
+
+def get_board_info():
+    """
+    board unique id and frequency
+    """
+    return ubinascii.hexlify(unique_id()).decode(), freq()
 
 
 def http_fan_on_off(req: str) -> None:
@@ -119,6 +137,13 @@ while True:
         stat_string = (
             f"{fan_state}<br>ADC feedback confirmation: Fan {'ON' if adc_reading < 3 else 'OFF'} ({adc_reading}V)"
         )
+        try:
+            wlan_ssid, wlan_ip, wlan_mac = get_wlan_info(wlan)
+            board_id, board_freq = get_board_info()
+            stat_string += f"<br><br>WLAN: {wlan_ssid}, IP: {wlan_ip}, MAC: {wlan_mac}"
+            stat_string += f"<br>Frequency: {board_freq / 1000000} MHz, Board ID: {board_id}"
+        except Exception as e:
+            print(f"Error gathering information: {e}")
         response = html % stat_string
         cl.send("HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n")
         cl.send(response)
